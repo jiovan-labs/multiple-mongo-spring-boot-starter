@@ -1,14 +1,14 @@
 # Multiple Mongo for Spring Boot Starter
-# Copyright (c) 2020 Unikue Ltd. All rights reserved.
-# https://unikue.cn
+# Copyright (c) 2020 Jiovan Ltd. All rights reserved.
+# https://jiovan.com
 
-cn.unikue.springstarter.multiplemongodb.config.MongoReactivePreConfiguration
-cn.unikue.springstarter.multiplemongodb.config.PrimaryMongoAutoConfiguration
-cn.unikue.springstarter.multiplemongodb.config.PrimaryMongoReactiveConfiguration
-cn.unikue.springstarter.multiplemongodb.config.PrimaryMongoRepositoryConfiguration
-cn.unikue.springstarter.multiplemongodb.config.SecondaryMongoAutoConfiguration
-cn.unikue.springstarter.multiplemongodb.config.SecondaryMongoReactiveConfiguration
-cn.unikue.springstarter.multiplemongodb.config.SecondaryMongoRepositoryConfiguration
-cn.unikue.springstarter.multiplemongodb.config.TertiaryMongoAutoConfiguration
-cn.unikue.springstarter.multiplemongodb.config.TertiaryMongoReactiveConfiguration
-cn.unikue.springstarter.multiplemongodb.config.TertiaryMongoRepositoryConfiguration
+com.jiovan.spring.starter.multiplemongo.config.MongoReactivePreConfiguration
+com.jiovan.spring.starter.multiplemongo.config.PrimaryMongoAutoConfiguration
+com.jiovan.spring.starter.multiplemongo.config.PrimaryMongoReactiveConfiguration
+com.jiovan.spring.starter.multiplemongo.config.PrimaryMongoRepositoryConfiguration
+com.jiovan.spring.starter.multiplemongo.config.SecondaryMongoAutoConfiguration
+com.jiovan.spring.starter.multiplemongo.config.SecondaryMongoReactiveConfiguration
+com.jiovan.spring.starter.multiplemongo.config.SecondaryMongoRepositoryConfiguration
+com.jiovan.spring.starter.multiplemongo.config.TertiaryMongoAutoConfiguration
+com.jiovan.spring.starter.multiplemongo.config.TertiaryMongoReactiveConfiguration
+com.jiovan.spring.starter.multiplemongo.config.TertiaryMongoRepositoryConfiguration

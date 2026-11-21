@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Unikue Ltd. All rights reserved.
+ * Copyright (c) 2020 Jiovan Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.unikue.springstarter.multiplemongodb.config;
+package com.jiovan.spring.starter.multiplemongo.config;
 
 
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -22,16 +22,16 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoReactiveAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoReactiveAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Repository;
 import com.mongodb.client.MongoClient;
-import cn.unikue.commonplexus.springcondition.annotation.ConditionalOnAllBooleanProperties;
-import cn.unikue.commonplexus.springcondition.annotation.ConditionalOnAnnotation;
+import com.jiovan.plexus.spring.condition.annotation.ConditionalOnAllBooleanProperties;
+import com.jiovan.plexus.spring.condition.annotation.ConditionalOnAnnotation;
 
 
 /**
@@ -41,14 +41,14 @@ import cn.unikue.commonplexus.springcondition.annotation.ConditionalOnAnnotation
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnAllBooleanProperties(value = {
-    @ConditionalOnBooleanProperty(prefix = "spring.multiple-mongo", name = "enabled", matchIfMissing = true),
+    @ConditionalOnBooleanProperty(prefix = "jiovan.multiple-mongo", name = "enabled", matchIfMissing = true),
     @ConditionalOnBooleanProperty(prefix = TertiaryMongoAutoConfiguration.PROPERTIES_PREFIX, name = "repository-enabled", matchIfMissing = true)
 })
 @ConditionalOnClass(value = MongoClient.class)
 @ConditionalOnBean(name = TertiaryMongoAutoConfiguration.MONGO_CLIENT)
 @ConditionalOnAnnotation(includeFilter = Repository.class, basePackage = TertiaryMongoRepositoryConfiguration.REPOSITORY_PACKAGE)
 @AutoConfigureAfter(value = TertiaryMongoAutoConfiguration.class)
-@AutoConfigureBefore(value = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, MongoReactiveAutoConfiguration.class, MongoReactiveDataAutoConfiguration.class})
+@AutoConfigureBefore(value = {MongoAutoConfiguration.class, DataMongoAutoConfiguration.class, MongoReactiveAutoConfiguration.class, DataMongoReactiveAutoConfiguration.class})
 @EnableMongoRepositories(basePackages = TertiaryMongoRepositoryConfiguration.REPOSITORY_PACKAGE, mongoTemplateRef = TertiaryMongoAutoConfiguration.MONGO_TEMPLATE)
 public class TertiaryMongoRepositoryConfiguration {
     public static final String REPOSITORY_PACKAGE = "**.repository.tertiary.mongo";    // $NON-NLS-1$

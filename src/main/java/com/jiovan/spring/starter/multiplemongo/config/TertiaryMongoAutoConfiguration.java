@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Unikue Ltd. All rights reserved.
+ * Copyright (c) 2020 Jiovan Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.unikue.springstarter.multiplemongodb.config;
+package com.jiovan.spring.starter.multiplemongo.config;
 
 
 import java.util.Collections;
@@ -29,16 +29,17 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProp
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataConfigurationUtils;
-import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoClientFactory;
-import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
-import org.springframework.boot.autoconfigure.mongo.MongoConfigurationUtils;
-import org.springframework.boot.autoconfigure.mongo.MongoConnectionDetails;
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
-import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoProperties;
+import org.springframework.boot.data.mongodb.autoconfigure.MongoDataConfigurationUtils;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoReactiveAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoClientFactory;
+import org.springframework.boot.mongodb.autoconfigure.MongoClientSettingsBuilderCustomizer;
+import org.springframework.boot.mongodb.autoconfigure.MongoConfigurationUtils;
+import org.springframework.boot.mongodb.autoconfigure.MongoConnectionDetails;
+import org.springframework.boot.mongodb.autoconfigure.MongoProperties;
+import org.springframework.boot.mongodb.autoconfigure.MongoReactiveAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.ApplicationContext;
@@ -57,8 +58,8 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.TransactionOptions;
 import com.mongodb.client.MongoClient;
-import cn.unikue.commonplexus.springcondition.annotation.ConditionalOnAnyProperties;
-import cn.unikue.springstarter.multiplemongodb.property.ExtendedMongoProperties;
+import com.jiovan.plexus.spring.condition.annotation.ConditionalOnAnyProperties;
+import com.jiovan.spring.starter.multiplemongo.property.ExtendedMongoProperties;
 
 
 /**
@@ -67,17 +68,18 @@ import cn.unikue.springstarter.multiplemongodb.property.ExtendedMongoProperties;
  * @author David Hsing
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnBooleanProperty(prefix = "spring.multiple-mongo", name = "enabled", matchIfMissing = true)
+@ConditionalOnBooleanProperty(prefix = "jiovan.multiple-mongo", name = "enabled", matchIfMissing = true)
 @ConditionalOnAnyProperties(value = {
     @ConditionalOnProperty(prefix = TertiaryMongoAutoConfiguration.PROPERTIES_PREFIX, name = "uri"),
     @ConditionalOnProperty(prefix = TertiaryMongoAutoConfiguration.PROPERTIES_PREFIX, name = "host")
 })
 @ConditionalOnClass(value = MongoClient.class)
 @AutoConfigureAfter(value = SecondaryMongoAutoConfiguration.class)
-@AutoConfigureBefore(value = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, MongoReactiveAutoConfiguration.class, MongoReactiveDataAutoConfiguration.class})
+@AutoConfigureBefore(value = {MongoAutoConfiguration.class, DataMongoAutoConfiguration.class, MongoReactiveAutoConfiguration.class, DataMongoReactiveAutoConfiguration.class})
 public class TertiaryMongoAutoConfiguration {
-    public static final String PROPERTIES_PREFIX = "spring.multiple-mongo.tertiary";    // $NON-NLS-1$
+    public static final String PROPERTIES_PREFIX = "jiovan.multiple-mongo.tertiary";    // $NON-NLS-1$
     public static final String MONGO_PROPERTIES = "tertiaryMongoProperties";    // $NON-NLS-1$
+    public static final String DATA_MONGO_PROPERTIES = "tertiaryDataMongoProperties";    // $NON-NLS-1$
     public static final String CONNECTION_DETAILS = "tertiaryMongoConnectionDetails";    // $NON-NLS-1$
     public static final String SSL_BUNDLES = "tertiaryMongoSslBundles";    // $NON-NLS-1$
     public static final String SETTINGS_BUILDER_CUSTOMIZER = "tertiaryMongoClientSettingsBuilderCustomizer";    // $NON-NLS-1$
@@ -94,6 +96,11 @@ public class TertiaryMongoAutoConfiguration {
     public static final String MONGO_TEMPLATE = "tertiaryMongoTemplate";    // $NON-NLS-1$
     public static final String GRID_FS_TEMPLATE = "tertiaryMongoGridFsTemplate";    // $NON-NLS-1$
 
+    /**
+     * Returns the tertiary mongo properties bean bound from the {@code jiovan.multiple-mongo.tertiary} configuration prefix
+     *
+     * @return the tertiary mongo properties bean
+     */
     @Bean(name = MONGO_PROPERTIES)
     @ConditionalOnMissingBean(name = MONGO_PROPERTIES)
     @ConfigurationProperties(prefix = PROPERTIES_PREFIX)
@@ -101,6 +108,26 @@ public class TertiaryMongoAutoConfiguration {
         return new ExtendedMongoProperties();
     }
 
+    /**
+     * Returns the tertiary data mongo properties bean bound from the {@code jiovan.multiple-mongo.tertiary} configuration prefix
+     *
+     * @return the tertiary data mongo properties bean
+     */
+    @Bean(name = DATA_MONGO_PROPERTIES)
+    @ConditionalOnMissingBean(name = DATA_MONGO_PROPERTIES)
+    @ConfigurationProperties(prefix = PROPERTIES_PREFIX)
+    public DataMongoProperties dataMongoProperties() {
+        return new DataMongoProperties();
+    }
+
+    /**
+     * Returns the tertiary mongo connection details bean built from the qualified mongo properties and SSL bundles
+     *
+     * @param properties the qualified tertiary mongo properties that supply the connection URI and credentials
+     * @param bundles the SSL bundles used to configure TLS connections
+     *
+     * @return the tertiary mongo connection details bean
+     */
     @Bean(name = CONNECTION_DETAILS)
     @ConditionalOnBean(name = MONGO_PROPERTIES)
     @ConditionalOnMissingBean(name = CONNECTION_DETAILS)
@@ -108,6 +135,15 @@ public class TertiaryMongoAutoConfiguration {
         return MongoConfigurationUtils.mongoConnectionDetails(properties, bundles);
     }
 
+    /**
+     * Returns the tertiary mongo client settings builder customizer bean built from the mongo properties and connection details
+     *
+     * @param properties the qualified tertiary mongo properties that supply the client settings
+     * @param details the qualified tertiary mongo connection details
+     * @param bundles the SSL bundles used to configure TLS connections
+     *
+     * @return the tertiary mongo client settings builder customizer bean
+     */
     @Bean(name = SETTINGS_BUILDER_CUSTOMIZER)
     @ConditionalOnBean(name = MONGO_PROPERTIES)
     @ConditionalOnMissingBean(name = SETTINGS_BUILDER_CUSTOMIZER)
@@ -117,6 +153,13 @@ public class TertiaryMongoAutoConfiguration {
         return MongoConfigurationUtils.mongoClientSettingsCustomizer(properties, details, bundles);
     }
 
+    /**
+     * Returns the tertiary mongo client factory bean configured with the qualified settings builder customizer
+     *
+     * @param customizer the qualified tertiary mongo client settings builder customizer
+     *
+     * @return the tertiary mongo client factory bean
+     */
     @Bean(name = CLIENT_FACTORY)
     @ConditionalOnBean(name = SETTINGS_BUILDER_CUSTOMIZER)
     @ConditionalOnMissingBean(name = CLIENT_FACTORY)
@@ -124,6 +167,13 @@ public class TertiaryMongoAutoConfiguration {
         return new MongoClientFactory(Collections.singletonList(customizer));
     }
 
+    /**
+     * Returns the tertiary mongo client settings bean built by applying the qualified customizer
+     *
+     * @param customizer the qualified tertiary mongo client settings builder customizer
+     *
+     * @return the tertiary mongo client settings bean
+     */
     @Bean(name = CLIENT_SETTINGS)
     @ConditionalOnBean(name = SETTINGS_BUILDER_CUSTOMIZER)
     @ConditionalOnMissingBean(name = CLIENT_SETTINGS)
@@ -131,6 +181,14 @@ public class TertiaryMongoAutoConfiguration {
         return MongoConfigurationUtils.mongoClientSettings(customizer);
     }
 
+    /**
+     * Returns the tertiary mongo client bean created by the qualified client factory from the given settings
+     *
+     * @param factory the qualified tertiary mongo client factory
+     * @param settings the qualified tertiary mongo client settings
+     *
+     * @return the tertiary mongo client bean
+     */
     @Bean(name = MONGO_CLIENT, destroyMethod = "close")
     @ConditionalOnBean(name = {CLIENT_FACTORY, CLIENT_SETTINGS})
     @ConditionalOnMissingBean(name = MONGO_CLIENT)
@@ -139,6 +197,16 @@ public class TertiaryMongoAutoConfiguration {
         return factory.createMongoClient(settings);
     }
 
+    /**
+     * Returns the tertiary mongo database factory bean backed by the qualified mongo client and configured from the mongo properties
+     *
+     * @param client the qualified tertiary mongo client
+     * @param properties the qualified tertiary mongo properties that supply the database name
+     * @param details the qualified tertiary mongo connection details
+     * @param bundles the SSL bundles used to configure TLS connections
+     *
+     * @return the tertiary mongo database factory bean
+     */
     @Bean(name = DATABASE_FACTORY)
     @ConditionalOnBean(name = {MONGO_CLIENT, MONGO_PROPERTIES})
     @ConditionalOnMissingBean(name = DATABASE_FACTORY)
@@ -149,6 +217,14 @@ public class TertiaryMongoAutoConfiguration {
         return MongoDataConfigurationUtils.mongoDatabaseFactory(client, properties, details, bundles);
     }
 
+    /**
+     * Returns the tertiary mongo transaction manager bean backed by the qualified database factory and optional transaction options
+     *
+     * @param factory the qualified tertiary mongo database factory
+     * @param options the qualified transaction options, may be {@code null}
+     *
+     * @return the tertiary mongo transaction manager bean
+     */
     @Bean(name = TRANSACTION_MANAGER)
     @ConditionalOnBean(name = DATABASE_FACTORY)
     @ConditionalOnMissingBean(name = TRANSACTION_MANAGER)
@@ -157,36 +233,80 @@ public class TertiaryMongoAutoConfiguration {
         return new MongoTransactionManager(factory, options);
     }
 
+    /**
+     * Returns the tertiary mongo custom conversions bean used to register converters with the mapping context
+     *
+     * @param properties the tertiary data mongo properties that supply the BigDecimal representation
+     *
+     * @return the tertiary mongo custom conversions bean
+     */
     @Bean(name = CUSTOM_CONVERSIONS)
     @ConditionalOnMissingBean(name = CUSTOM_CONVERSIONS)
-    public MongoCustomConversions mongoCustomConversions() {
-        return MongoDataConfigurationUtils.mongoCustomConversions();
+    public MongoCustomConversions mongoCustomConversions(@Qualifier(value = DATA_MONGO_PROPERTIES) @Nonnull DataMongoProperties properties) {
+        return MongoDataConfigurationUtils.mongoCustomConversions(properties);
     }
 
+    /**
+     * Returns the tertiary mongo managed types bean discovered from the given application context
+     *
+     * @param context the application context used to discover managed types
+     *
+     * @return the tertiary mongo managed types bean
+     *
+     * @throws ClassNotFoundException if a discovered managed type cannot be loaded
+     */
     @Bean(name = MANAGED_TYPES)
     @ConditionalOnMissingBean(name = MANAGED_TYPES)
     public MongoManagedTypes mongoManagedTypes(@Nonnull ApplicationContext context) throws ClassNotFoundException {
         return MongoDataConfigurationUtils.mongoManagedTypes(context);
     }
 
+    /**
+     * Returns the tertiary mongo mapping context bean configured with the qualified properties, conversions and managed types
+     *
+     * @param properties the qualified tertiary data mongo properties that control auto index creation and field naming strategy
+     * @param conversions the qualified tertiary mongo custom conversions
+     * @param types the qualified tertiary mongo managed types
+     *
+     * @return the tertiary mongo mapping context bean
+     */
     @Bean(name = MAPPING_CONTEXT)
-    @ConditionalOnBean(name = {CUSTOM_CONVERSIONS, MONGO_PROPERTIES})
+    @ConditionalOnBean(name = {CUSTOM_CONVERSIONS, DATA_MONGO_PROPERTIES})
     @ConditionalOnMissingBean(name = MAPPING_CONTEXT)
-    public MongoMappingContext mongoMappingContext(@Qualifier(value = MONGO_PROPERTIES) @Nonnull MongoProperties properties,
+    public MongoMappingContext mongoMappingContext(@Qualifier(value = DATA_MONGO_PROPERTIES) @Nonnull DataMongoProperties properties,
         @Qualifier(value = CUSTOM_CONVERSIONS) @Nonnull MongoCustomConversions conversions,
         @Qualifier(value = MANAGED_TYPES) @Nonnull MongoManagedTypes types) {
         return MongoDataConfigurationUtils.mongoMappingContext(properties, conversions, types);
     }
 
+    /**
+     * Returns the tertiary mapping mongo converter bean backed by the qualified database factory and mapping context
+     *
+     * @param properties the qualified tertiary data mongo properties retained for configuration consistency
+     * @param factory the qualified tertiary mongo database factory
+     * @param context the qualified tertiary mongo mapping context
+     * @param conversions the qualified tertiary mongo custom conversions
+     *
+     * @return the tertiary mapping mongo converter bean
+     */
     @Bean(name = MAPPING_CONVERTER)
-    @ConditionalOnBean(name = {DATABASE_FACTORY, MAPPING_CONTEXT, CUSTOM_CONVERSIONS, MONGO_PROPERTIES})
+    @ConditionalOnBean(name = {DATABASE_FACTORY, MAPPING_CONTEXT, CUSTOM_CONVERSIONS, DATA_MONGO_PROPERTIES})
     @ConditionalOnMissingBean(name = MAPPING_CONVERTER)
-    public MappingMongoConverter mongoMappingConverter(@Qualifier(value = DATABASE_FACTORY) @Nonnull MongoDatabaseFactory factory,
+    public MappingMongoConverter mongoMappingConverter(@Qualifier(value = DATA_MONGO_PROPERTIES) @Nonnull DataMongoProperties properties,
+        @Qualifier(value = DATABASE_FACTORY) @Nonnull MongoDatabaseFactory factory,
         @Qualifier(value = MAPPING_CONTEXT) @Nonnull MongoMappingContext context,
         @Qualifier(value = CUSTOM_CONVERSIONS) @Nonnull MongoCustomConversions conversions) {
-        return MongoDataConfigurationUtils.mappingMongoConverter(factory, context, conversions);
+        return MongoDataConfigurationUtils.mappingMongoConverter(properties, factory, context, conversions);
     }
 
+    /**
+     * Returns the tertiary mongo template bean backed by the qualified database factory and converter
+     *
+     * @param factory the qualified tertiary mongo database factory
+     * @param converter the qualified tertiary mapping mongo converter
+     *
+     * @return the tertiary mongo template bean
+     */
     @Bean(name = MONGO_TEMPLATE)
     @ConditionalOnBean(name = {DATABASE_FACTORY, MAPPING_CONVERTER})
     @ConditionalOnMissingBean(name = MONGO_TEMPLATE)
@@ -195,10 +315,21 @@ public class TertiaryMongoAutoConfiguration {
         return new MongoTemplate(factory, converter);
     }
 
+    /**
+     * Returns the tertiary GridFsTemplate bean configured from the qualified mongo properties, database factory and mongo template
+     *
+     * @param properties the qualified tertiary data mongo properties that supply the GridFS database and bucket names
+     * @param factory the qualified tertiary mongo database factory
+     * @param template the qualified tertiary mongo template
+     * @param details the qualified tertiary mongo connection details
+     * @param bundles the SSL bundles used to configure TLS connections
+     *
+     * @return the tertiary GridFS template bean
+     */
     @Bean(name = GRID_FS_TEMPLATE)
-    @ConditionalOnBean(name = {DATABASE_FACTORY, MONGO_TEMPLATE, MONGO_PROPERTIES})
+    @ConditionalOnBean(name = {DATABASE_FACTORY, MONGO_TEMPLATE, DATA_MONGO_PROPERTIES})
     @ConditionalOnMissingBean(name = GRID_FS_TEMPLATE)
-    public GridFsTemplate mongoGridFsTemplate(@Qualifier(value = MONGO_PROPERTIES) @Nonnull MongoProperties properties,
+    public GridFsTemplate mongoGridFsTemplate(@Qualifier(value = DATA_MONGO_PROPERTIES) @Nonnull DataMongoProperties properties,
         @Qualifier(value = DATABASE_FACTORY) @Nonnull MongoDatabaseFactory factory,
         @Qualifier(value = MONGO_TEMPLATE) @Nonnull MongoTemplate template,
         @Qualifier(value = CONNECTION_DETAILS) @Nonnull MongoConnectionDetails details,

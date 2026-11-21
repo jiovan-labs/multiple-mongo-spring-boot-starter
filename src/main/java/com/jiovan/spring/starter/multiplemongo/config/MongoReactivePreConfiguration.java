@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Unikue Ltd. All rights reserved.
+ * Copyright (c) 2020 Jiovan Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package cn.unikue.springstarter.multiplemongodb.config;
+package com.jiovan.spring.starter.multiplemongo.config;
 
 
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoReactiveAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoReactiveAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -36,14 +36,20 @@ import reactor.core.publisher.Flux;
  * Pre-Configuration for reactive mongo
  *
  * @author David Hsing
- * @see org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration
+ *
+ * @see org.springframework.boot.data.mongodb.autoconfigure.DataMongoReactiveAutoConfiguration
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(value = {MongoClient.class, Flux.class})
-@AutoConfigureBefore(value = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, MongoReactiveAutoConfiguration.class, MongoReactiveDataAutoConfiguration.class})
+@AutoConfigureBefore(value = {MongoAutoConfiguration.class, DataMongoAutoConfiguration.class, MongoReactiveAutoConfiguration.class, DataMongoReactiveAutoConfiguration.class})
 public class MongoReactivePreConfiguration {
     public static final String DATA_BUFFER_FACTORY = "mongoDataBufferFactory";    // $NON-NLS-1$
 
+    /**
+     * Returns the default data buffer factory bean used to allocate buffers for reactive mongo templates
+     *
+     * @return the default data buffer factory bean
+     */
     @Primary
     @Bean(name = DATA_BUFFER_FACTORY)
     @ConditionalOnMissingBean(name = DATA_BUFFER_FACTORY)
